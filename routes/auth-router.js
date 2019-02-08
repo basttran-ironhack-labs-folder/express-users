@@ -66,17 +66,29 @@ router.post("/process-login", (req, res, next) => {
         return;
       }
       // email & password are CORRECT!
-      // if we MANUALLY managed the user session
-      req.session.userId = userDoc._id;
+      // if we MANUALLY managed the user session:
+      // req.session.userId = userDoc._id;
 
       // instead we will use PASSPORT - an npm package for managing user sessions
-
+      // req.login() is a Passport method that calls serialize*user()
+      // (that saves the USER ID in the session which means we are logged-in)
+      req.logIn(userDoc, () =>{
       // req.flash() sends a feedback message before a redirect
       // (it's defined by the "connect-flash" npm package)
       req.flash("success", "Log in success!");
-      res.redirect("/");
+      res.redirect("/");  
+      })
+      
     })
     .catch(err => next(err));
 });
+
+router.get("/logout", (req, res, next) => {
+  // req.logOut(); is a Passport method that removes the USER ID from the session 
+  req.logOut();
+
+  req.flash("success", "Logged out successfully!")
+  res.redirect("/")
+})
 
 module.exports = router;
